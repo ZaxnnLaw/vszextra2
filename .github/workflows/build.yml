@@ -3,13 +3,8 @@ name: build-vsze-extras
 on:
   push:
     branches: [main]
-    paths-ignore: ['*.jar', '**.md', '**.txt']
+    paths-ignore: ['**.md', '**.txt']
   workflow_dispatch:
-    inputs:
-      publish:
-        description: 'Commit jar hasil build ke root repo (dipakai launcher via EXTRAS_URL)'
-        type: boolean
-        default: false
 
 permissions:
   contents: read
@@ -89,7 +84,8 @@ jobs:
             -Pyarn_mappings='${{ steps.ver.outputs.yarn }}' \
             -Ploader_version='${{ steps.ver.outputs.loader }}' \
             -Pfabric_version='${{ steps.ver.outputs.fapi }}' \
-            -Ploom_version='${{ matrix.loom }}'
+            -Ploom_version='${{ matrix.loom }}' \
+            -Pmod_version='1.0.${{ github.run_number }}'
 
       - name: Cek hasil build
         run: |
@@ -111,39 +107,42 @@ jobs:
           mkdir -p out
           JAR=$(ls build/libs/*.jar | grep -v -e '-sources' -e '-dev' | head -n1)
           cp "$JAR" "out/vsze-extras-${{ matrix.mc }}.jar"
+          # file kecil yang dicek launcher untuk tahu ada update atau tidak
+          echo '{"version":"1.0.${{ github.run_number }}"}' > "out/vsze-extras-${{ matrix.mc }}.json"
           ls -l out
 
       - uses: actions/upload-artifact@v4
         with:
           name: vsze-extras-${{ matrix.mc }}
-          path: out/vsze-extras-${{ matrix.mc }}.jar
+          path: out/vsze-extras-${{ matrix.mc }}.*
           if-no-files-found: error
 
-  # Opsional: taruh semua jar yang berhasil di root repo, supaya launcher bisa
-  # mengunduhnya dari https://raw.githubusercontent.com/<user>/<repo>/main/vsze-extras-<versi>.jar
+  # Otomatis: semua jar yang berhasil dibuild dipublish ke Release dengan tag "extras" (ditimpa tiap build).
+  # Launcher mengambil dari https://github.com/<user>/<repo>/releases/download/extras/vsze-extras-<versi>.jar
   publish:
     needs: build
-    if: ${{ always() && inputs.publish == true }}
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-
       - uses: actions/download-artifact@v4
         with:
           pattern: vsze-extras-*
           path: dist
           merge-multiple: true
 
-      - name: Commit jar
+      - name: Publish ke Release "extras"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+          ls -l dist
           if ! ls dist/*.jar >/dev/null 2>&1; then echo "::error::Tidak ada jar untuk dipublish"; exit 1; fi
-          cp dist/*.jar .
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add vsze-extras-*.jar
-          git diff --cached --quiet && { echo "Tidak ada perubahan"; exit 0; }
-          git commit -m "build: vsze-extras jar ($(date -u +%F))"
-          git push
+          gh release view extras >/dev/null 2>&1 || gh release create extras \
+            --target "${{ github.sha }}" --title "VSZE Extras (terbaru)" \
+            --notes "Jar terbaru vsze-extras. Ditimpa otomatis tiap build; diambil oleh launcher."
+          # jar dulu, json terakhir: launcher baru melihat versi baru setelah jar-nya siap
+          gh release upload extras dist/*.jar --clobber
+          gh release upload extras dist/*.json --clobber
