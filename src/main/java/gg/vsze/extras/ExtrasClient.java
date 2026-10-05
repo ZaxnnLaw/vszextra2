@@ -40,6 +40,8 @@ public class ExtrasClient implements ClientModInitializer {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(VszeCommand.root("vszeextra"));
             dispatcher.register(VszeCommand.root("vszehud"));
+            dispatcher.register(VszeAbout.root());      // /vsze about
+            dispatcher.register(VszeAbout.hackRoot());  // /vszehack on|off (cuma bercanda)
         });
         HudRenderCallback.EVENT.register(ArmorHud::render);
         HudRenderCallback.EVENT.register(HudModules::render);

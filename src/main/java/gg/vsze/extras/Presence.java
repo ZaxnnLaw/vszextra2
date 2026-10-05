@@ -25,6 +25,8 @@ public final class Presence {
             return TextCodecs.CODEC.parse(JsonOps.INSTANCE, j).result().orElse(Text.literal(""));
         } catch (Throwable t) { return Text.literal(""); }
     }
+    /** Ikon badge VSZE untuk dipakai di tempat lain (mis. /vsze about). */
+    public static Text iconText() { return ICON; }
     public record Friend(String name, String id, String status, String server, String tier) {}
     public static volatile List<Friend> friends = List.of();
     public static final Map<String, List<String>> LOG = new ConcurrentHashMap<>();
