@@ -27,8 +27,8 @@ jobs:
           - { mc: '1.21.6',  loom: '1.10-SNAPSHOT', gradle: '8.12' }
           - { mc: '1.21.7',  loom: '1.10-SNAPSHOT', gradle: '8.12' }
           - { mc: '1.21.8',  loom: '1.10-SNAPSHOT', gradle: '8.12' }
-          - { mc: '1.21.9',  loom: '1.11-SNAPSHOT', gradle: '8.14.3' }
-          - { mc: '1.21.10', loom: '1.11-SNAPSHOT', gradle: '8.14.3' }
+          - { mc: '1.21.9',  loom: '1.14-SNAPSHOT', gradle: '9.2.0' }
+          - { mc: '1.21.10', loom: '1.14-SNAPSHOT', gradle: '9.2.0' }
           - { mc: '1.21.11', loom: '1.14-SNAPSHOT', gradle: '9.2.0' }
 
     steps:
