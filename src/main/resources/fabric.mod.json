@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "vsze-extras",
+  "version": "${version}",
+  "name": "VSZE Extras",
+  "description": "ArmorHUD, HUD PvP (setting lewat /vszeextra), dan tombol update mod di menu utama",
+  "authors": ["ZANN"],
+  "environment": "client",
+  "entrypoints": { "client": ["gg.vsze.extras.ExtrasClient"] },
+  "mixins": ["vsze-extras.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "${mc}",
+    "fabric-api": "*"
+  }
+}

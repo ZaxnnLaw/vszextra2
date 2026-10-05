@@ -1,0 +1,5 @@
+{
+  "menu_music": {
+    "sounds": [ { "name": "vsze-extras:menu/migumilyrics", "stream": true } ]
+  }
+}

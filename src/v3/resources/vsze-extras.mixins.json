@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "gg.vsze.extras.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["TitleScreenMixin", "LogoDrawerMixin", "MusicTrackerMixin", "PlayerNameMixin", "TabListMixin", "PauseMixin", "CameraMixin", "EntityLookMixin"],
+  "injectors": { "defaultRequire": 0 }
+}

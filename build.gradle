@@ -1,0 +1,42 @@
+plugins {
+    id 'fabric-loom'
+}
+
+version = project.mod_version
+group = 'gg.vsze'
+base { archivesName = 'vsze-extras' }
+
+// Kelompok kode per versi Minecraft (API-nya beda-beda):
+//   v1 = 1.21 - 1.21.1   v2 = 1.21.2 - 1.21.5   v3 = 1.21.6 - 1.21.8   v4 = 1.21.9 - 1.21.11
+def patch = (project.minecraft_version.tokenize('.')[2] ?: '0') as int
+def grp = patch <= 1 ? 'v1' : patch <= 5 ? 'v2' : patch <= 8 ? 'v3' : 'v4'
+println "VSZE: Minecraft ${project.minecraft_version} -> kode ${grp}"
+
+sourceSets {
+    main {
+        java.srcDir "src/${grp}/java"
+        resources.srcDir "src/${grp}/resources"
+    }
+}
+
+repositories { }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mc', project.minecraft_version
+    filesMatching('fabric.mod.json') { expand 'version': project.version, 'mc': project.minecraft_version }
+}
+
+tasks.withType(JavaCompile).configureEach { it.options.release = 21 }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
